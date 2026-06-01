@@ -40,6 +40,17 @@ class Handler(BaseHTTPRequestHandler):
             data = json.loads(body)
             print(f"收到消息: {json.dumps(data, ensure_ascii=False)}")
 
+            # 处理飞书 URL 验证（url_verification 类型）
+            if data.get('type') == 'url_verification':
+                challenge = data.get('challenge', '')
+                response = {"challenge": challenge}
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(response).encode())
+                print(f"URL 验证成功，challenge: {challenge}")
+                return
+
             # 处理事件
             event = data.get('event', {})
             event_type = data.get('event_type', '')
